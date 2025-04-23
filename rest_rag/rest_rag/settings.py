@@ -32,12 +32,14 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "rest_framework",
-    "corsheaders",
+    "corsheaders",  
     "pgvector.django",
     "chat",
     "documents",
     "users",
     "rag",
+    'crispy_forms',
+    "crispy_bootstrap5",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -137,3 +139,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
