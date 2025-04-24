@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "rag",
     'crispy_forms',
     "crispy_bootstrap5",
+    "django_extensions",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -143,3 +144,7 @@ AUTH_USER_MODEL = 'users.CustomUser'
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+LOGIN_URL = 'login'
+
+LOGIN_REDIRECT_URL = "/"
