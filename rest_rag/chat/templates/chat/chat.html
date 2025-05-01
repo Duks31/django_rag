@@ -34,22 +34,31 @@
       </div>
 
       <div class="card-footer bg-white border-0">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
           {% csrf_token %}
-          <div class="input-group">
+          <div
+            class="d-flex align-items-end p-2 rounded-4 border"
+            style="gap: 10px; background-color: #f1f1f1"
+          >
+
+            <!-- Expanding Textarea -->
             <textarea
               id="chat-input"
               name="content"
+              class="form-control border-0 shadow-none"
               rows="1"
-              class="form-control rounded-start-pill"
               placeholder="Type your message..."
               required
+              style="resize: none; overflow-y: auto; max-height: 200px"
             ></textarea>
+
+            <!-- Send Button -->
             <button
-              class="btn btn-outline-primary rounded-end-pill"
               type="submit"
+              class="btn btn-primary rounded-circle shadow-sm"
+              style="width: 40px; height: 40px"
             >
-              Send
+              <i class="bi bi-arrow-up"></i>
             </button>
           </div>
         </form>
@@ -59,24 +68,47 @@
 </div>
 
 <script>
-    window.onload = function () {
-      const chatBox = document.getElementById("chat-messages");
-      chatBox.scrollTo({
-        top: chatBox.scrollHeight,
-        behavior: "smooth",
-      });
-  
-      const input = document.getElementById("chat-input");
-      if (input) {
-        input.focus();
-  
-        input.addEventListener("keydown", function (event) {
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            input.closest('form').submit();
-          }
-        });
+  const textarea = document.getElementById("chat-input");
+
+  textarea.addEventListener("input", function () {
+    this.style.height = "auto"; // reset first
+    const maxHeight = 200;
+    if (this.scrollHeight <= maxHeight) {
+      this.style.height = this.scrollHeight + "px";
+    } else {
+      this.style.height = maxHeight + "px";
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const chatBox = document.getElementById("chat-messages");
+    const input = document.getElementById("chat-input");
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    if (input) input.focus();
+
+    input.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        this.form.submit();
       }
-    };
-  </script>
+    });
+  });
+
+  window.onload = function () {
+
+    const input = document.getElementById("chat-input");
+    if (input) {
+      input.focus();
+
+      input.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          input.closest("form").submit();
+        }
+      });
+    }
+  };
+</script>
 {% endblock content %}

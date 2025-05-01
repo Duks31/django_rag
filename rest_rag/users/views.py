@@ -12,7 +12,7 @@ class RegisterView(View):
 
         if form.is_valid():
             form.save()
-            return redirect("index")
+            return redirect("documents:upload")
         
         return render(request, "users/register.html", {'form': form})
     

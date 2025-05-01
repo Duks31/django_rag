@@ -1,0 +1,219 @@
+{% extends 'users/base.html' %} {% load crispy_forms_tags %} {% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <!-- Document Upload Card -->
+      <div class="card shadow-sm mb-4 border-0">
+        <div class="card-body">
+          <h2 class="card-title mb-4 text-center">Document Library</h2>
+
+          <!-- Upload Form with Visual Elements -->
+          <form method="POST" enctype="multipart/form-data" class="mb-4">
+            {% csrf_token %}
+            <div class="upload-area text-center mb-4">
+              <label
+                for="documentUpload"
+                class="upload-container d-block p-4 border rounded"
+              >
+                <div class="upload-icon mb-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="48"
+                    height="48"
+                    fill="#6c757d"
+                    viewBox="0 0 16 16"
+                  >
+                    <path
+                      d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"
+                    />
+                    <path
+                      d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"
+                    />
+                  </svg>
+                </div>
+                <p class="mb-3">Select a document to upload</p>
+                <input
+                  type="file"
+                  name="document"
+                  id="documentUpload"
+                  class="file-input"
+                  required
+                />
+                <div id="fileNameDisplay" class="text-muted mt-2">
+                  No file selected
+                </div>
+              </label>
+
+              <button
+                type="submit"
+                id="uploadButton"
+                class="btn px-4 mt-3"
+              >
+                Upload Document
+              </button>
+            </div>
+          </form>
+
+          <!-- Horizontal Line -->
+          <hr class="my-4" />
+
+          <!-- Document Grid Display -->
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Your Documents</h3>
+            <a href="{% url 'chat:chat' %}" class="btn btn-outline-success btn">
+              <i class="bi bi-chat-left-text me-2"></i>Chat
+            </a>
+          </div>
+
+          <div class="row row-cols-1 row-cols-md-4 g-4">
+            {% for doc in documents %}
+            <div class="col">
+              <div class="card h-100 document-card">
+                <div class="card-body text-center">
+                  <!-- Document Icon -->
+                  <div class="document-icon mb-3">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="32"
+                      height="32"
+                      fill="currentColor"
+                      class="bi bi-file-text"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M5 4a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8a.5.5 0 0 0 0 1h6a.5.5 0 0 0 0-1H5zm0 2a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1H5z"
+                      />
+                      <path
+                        d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm10-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1z"
+                      />
+                    </svg>
+                  </div>
+                  <h5 class="card-title text-truncate">
+                    {{ doc.document_name|default:doc.file.name }}
+                  </h5>
+                  <p class="card-text text-muted small">
+                    {{ doc.uploaded_at|date:"M d, H:i" }}
+                  </p>
+                  <!-- <a
+                  href="{% url 'chat:chat' %}?doc_id={{ doc.id }}"
+                  class="btn btn-sm btn-outline-success"
+                >
+                  Chat
+                </a> -->
+                </div>
+              </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+              <div class="empty-state">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="48"
+                  height="48"
+                  fill="currentColor"
+                  class="bi bi-file-earmark-x text-muted mb-3"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M6.854 7.146a.5.5 0 1 0-.708.708L7.293 9l-1.147 1.146a.5.5 0 0 0 .708.708L8 9.707l1.146 1.147a.5.5 0 0 0 .708-.708L8.707 9l1.147-1.146a.5.5 0 0 0-.708-.708L8 8.293 6.854 7.146z"
+                  />
+                  <path
+                    d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"
+                  />
+                </svg>
+                <p class="text-muted">
+                  You haven't uploaded any documents yet.
+                </p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .document-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #dee2e6;
+  }
+
+  .document-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .upload-container {
+    background-color: #f0f2f5;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .upload-container:hover {
+    background-color: #e2e6ea;
+  }
+
+  .document-icon,
+  .upload-icon {
+    color: #6c757d;
+  }
+
+  .file-input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
+
+  #upload-area {
+    background-color: #e9ecef;
+    padding: 20px;
+    border-radius: 5px;
+  }
+
+  #uploadButton {
+    border-radius: 5px;
+    font-weight: 500;
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+  }
+
+  #uploadButton:enabled:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+  }
+
+  #uploadButton:disabled {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    opacity: 0.65;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const fileInput = document.getElementById("documentUpload");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const uploadButton = document.getElementById("uploadButton");
+
+    if (fileInput && fileNameDisplay && uploadButton) {
+      fileInput.addEventListener("change", function () {
+        if (this.files && this.files[0]) {
+          const fileName = this.files[0].name;
+          fileNameDisplay.textContent = fileName;
+          uploadButton.disabled = false;
+        } else {
+          fileNameDisplay.textContent = "No file selected";
+          uploadButton.disabled = true; // Disable when no file
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

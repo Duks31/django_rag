@@ -3,6 +3,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from .models import Conversation, Message
 from django.urls import reverse
+from documents.models import Documents
+from django.contrib import messages
 
 # Create your views here.
 class ChatView(LoginRequiredMixin, View):
@@ -18,11 +20,12 @@ class ChatView(LoginRequiredMixin, View):
     
     def post(self, request):
         content = request.POST.get("content")
+        conversation, _ = Conversation.objects.get_or_create(user = request.user)
+
         if content:
-            conversation, _ = Conversation.objects.get_or_create(user = request.user)
-
             Message.objects.create(conversation = conversation, sender = "user", content = content)
-
             Message.objects.create(conversation = conversation, sender = "ai", content = "This is the AI response. ")
-
-        return redirect(reverse("index"))
+            
+        return redirect(reverse("chat"))
+    
+    
