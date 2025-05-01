@@ -13,4 +13,3 @@ class Message(models.Model):
     sender = models.CharField(max_length=10, choices = (("user", "User"), ("ai", "AI")))
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-
