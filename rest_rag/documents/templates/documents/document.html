@@ -44,11 +44,7 @@
                 </div>
               </label>
 
-              <button
-                type="submit"
-                id="uploadButton"
-                class="btn px-4 mt-3"
-              >
+              <button type="submit" id="uploadButton" class="btn px-4 mt-3">
                 Upload Document
               </button>
             </div>
@@ -61,7 +57,7 @@
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="mb-0">Your Documents</h3>
             <a href="{% url 'chat:chat' %}" class="btn btn-outline-success btn">
-              <i class="bi bi-chat-left-text me-2"></i>Chat
+              <i class="bi bi-chat-left-text me-2"></i>Go to Chat
             </a>
           </div>
 
@@ -94,12 +90,20 @@
                   <p class="card-text text-muted small">
                     {{ doc.uploaded_at|date:"M d, H:i" }}
                   </p>
-                  <!-- <a
-                  href="{% url 'chat:chat' %}?doc_id={{ doc.id }}"
-                  class="btn btn-sm btn-outline-success"
-                >
-                  Chat
-                </a> -->
+                  <form
+                    method="POST"
+                    action="{% url 'documents:delete' doc.pk %}"
+                    class="mt-2"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="submit"
+                      class="btn btn-sm btn-outline-danger w-100"
+                      onclick="return confirm('Are you sure you want to delete this document?');"
+                    >
+                      <i class="bi bi-trash"></i> Delete
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

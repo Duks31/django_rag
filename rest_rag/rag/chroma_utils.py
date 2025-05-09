@@ -5,11 +5,11 @@ import fitz  # PyMuPDF
 import docx
 from django.conf import settings
 from pathlib import Path
-from langchain.embeddings import SentenceTransformerEmbeddings
-from langchain.vectorstores import Chroma
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-embedding_model = SentenceTransformerEmbeddings(model_name="all-MiniLM-L6-v2")
+embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 
 def extract_text(file_path: str) -> str:
@@ -66,11 +66,11 @@ def chunk_text(text):
 def get_chroma_client(user_id):
     persist_dir = Path(settings.BASE_DIR) / ".chroma" / f"user_{user_id}"
     persist_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Chroma client initialized at: {persist_dir}")
 
     return chromadb.Client(
-        chromadb.config.Settings(
-            persist_dir=str(persist_dir), chroma_db_impl="duckdb+parquet"
-        )
+        path=str(persist_dir),
+        settings=chromadb.config.Settings(chroma_db_impl="duckdb+parquet"),
     )
 
 
@@ -88,4 +88,3 @@ def get_chroma_vectorstore(user_id):
 def add_texts_to_user_store(user_id, texts, metadata=None):
     store = get_chroma_vectorstore(user_id)
     store.add_texts(texts, metadatas=metadata or [{} for _ in texts])
-    store.persist()

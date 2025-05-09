@@ -26,6 +26,6 @@ class ChatView(LoginRequiredMixin, View):
             Message.objects.create(conversation = conversation, sender = "user", content = content)
             Message.objects.create(conversation = conversation, sender = "ai", content = "This is the AI response. ")
             
-        return redirect(reverse("chat"))
+        return redirect(reverse("chat:chat"))
     
     

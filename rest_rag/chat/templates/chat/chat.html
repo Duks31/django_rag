@@ -2,10 +2,18 @@
 <div class="row justify-content-center">
   <div class="col-12 col-lg-10 mt-3" style="min-height: 80vh">
     <div class="card shadow-sm rounded-4">
-      <div class="card-header bg-white border-0">
-        <h2 class="mb-0 text-center">💬 Chat</h2>
+      <div class="card-header bg-white border-0 position-relative">
+        <div class="text-center">
+          <h2 class="mb-0">💬 Chat</h2>
+        </div>
+        <a
+          href="{% url 'documents:upload' %}"
+          class="btn btn-secondary position-absolute"
+          style="left: 15px; top: 50%; transform: translateY(-50%)"
+        >
+          ← Back to Docs
+        </a>
       </div>
-
       <div
         id="chat-messages"
         class="card-body"
@@ -22,7 +30,7 @@
             <div class="fw-semibold small text-uppercase mb-1">
               {{ message.sender }}
             </div>
-            <div>{{ message.content }}</div>
+            <div>{{ message.conteznt }}</div>
             <div class="small text-muted mt-1">
               {{ message.created_at|date:"M d, H:i" }}
             </div>
@@ -40,7 +48,6 @@
             class="d-flex align-items-end p-2 rounded-4 border"
             style="gap: 10px; background-color: #f1f1f1"
           >
-
             <!-- Expanding Textarea -->
             <textarea
               id="chat-input"
@@ -97,7 +104,6 @@
   });
 
   window.onload = function () {
-
     const input = document.getElementById("chat-input");
     if (input) {
       input.focus();
