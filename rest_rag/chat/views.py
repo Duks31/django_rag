@@ -2,15 +2,16 @@ import os
 from dotenv import load_dotenv
 
 from django.shortcuts import render, redirect
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views import View
 from .models import Conversation, Message
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from documents.models import Documents
 from django.contrib import messages
 from rag.rag_utils import embed_query, get_chroma_client, get_chroma_vectorstore
 from groq import Groq
 from django.http import StreamingHttpResponse, JsonResponse
+from django.views.generic import DeleteView
 import json
 import markdown
 
@@ -29,7 +30,11 @@ class ChatView(LoginRequiredMixin, View):
         return render(
             request,
             "chat/chat.html",
-            {"messages": messages, "username": request.user.username},
+            {
+                "messages": messages,
+                "username": request.user.username,
+                "conversation": conversation,
+            },
         )
 
     def post(self, request):
@@ -49,7 +54,7 @@ class ChatView(LoginRequiredMixin, View):
 
             context_text = "\n\n".join(context_docs)
             prompt = f""" 
-            You are an AI assistant. Use the following context to answer the question. \n\n Context: \n{context_text}\n\n User: {content}\n AI: """
+            "You are an AI assistant. The user has uploaded a document and wants to have a conversation about its contents. Answer the user's questions using the information from the uploaded document.  \n\n Context: \n{context_text}\n\n User: {content}\n AI: """
 
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return StreamingHttpResponse(
@@ -63,12 +68,20 @@ class ChatView(LoginRequiredMixin, View):
                 conversation=conversation,
                 sender="ai",
                 content=markdown.markdown(
-                    response,
-                    extensions=["extra", "nl2br", "sane_lists"]
+                    response, extensions=["extra", "nl2br", "sane_lists"]
                 ),
             )
 
         return redirect(reverse("chat:chat"))
+
+
+class ConversationDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Conversation
+    success_url = reverse_lazy("chat:chat")
+
+    def test_func(self):
+        conversation = self.get_object()
+        return conversation.user == self.request.user
 
 
 def call_groq(prompt):
@@ -104,9 +117,9 @@ def streaming_groq_response(prompt, conversation):
             yield f"data: {json.dumps({'chunk': delta.content})}\n\n"
 
     Message.objects.create(
-        conversation = conversation, 
-        sender = "ai", 
-        content = full_response,
+        conversation=conversation,
+        sender="ai",
+        content=full_response,
     )
 
     yield f"data: {json.dumps({'done': True})}\n\n"
