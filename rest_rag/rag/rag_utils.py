@@ -8,7 +8,10 @@ from pathlib import Path
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-
+from chromadb import PersistentClient
+from chromadb.config import Settings
+from langchain_community.vectorstores.chroma import Chroma as LangchainChroma
+    
 embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 
@@ -68,17 +71,19 @@ def get_chroma_client(user_id):
     persist_dir.mkdir(parents=True, exist_ok=True)
     print(f"Chroma client initialized at: {persist_dir}")
 
-    return chromadb.Client(
-        path=str(persist_dir),
-        settings=chromadb.config.Settings(chroma_db_impl="duckdb+parquet"),
+    chroma_settings = Settings(
+        persist_directory=str(persist_dir),
+        chroma_db_impl="duckdb+parquet",
     )
+
+    return PersistentClient(settings=chroma_settings)
 
 
 def get_chroma_vectorstore(user_id):
     persist_dir = Path(settings.BASE_DIR) / ".chroma" / f"user_{user_id}"
     persist_dir.mkdir(parents=True, exist_ok=True)
 
-    return Chroma(
+    return LangchainChroma(
         collection_name=f"user_{user_id}_collection",
         embedding_function=embedding_model,
         persist_directory=str(persist_dir),
@@ -88,3 +93,7 @@ def get_chroma_vectorstore(user_id):
 def add_texts_to_user_store(user_id, texts, metadata=None):
     store = get_chroma_vectorstore(user_id)
     store.add_texts(texts, metadatas=metadata or [{} for _ in texts])
+
+
+def embed_query(text: str):
+    return embedding_model.embed_query(text)

@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
 from .models import Documents
-from rag.chroma_utils import (
+from rag.rag_utils import (
     extract_text,
     chunk_text,
     get_chroma_client,
