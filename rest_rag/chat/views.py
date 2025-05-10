@@ -12,6 +12,7 @@ from rag.rag_utils import embed_query, get_chroma_client, get_chroma_vectorstore
 from groq import Groq
 from django.http import StreamingHttpResponse, JsonResponse
 import json
+import markdown
 
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -61,7 +62,10 @@ class ChatView(LoginRequiredMixin, View):
             Message.objects.create(
                 conversation=conversation,
                 sender="ai",
-                content=response,
+                content=markdown.markdown(
+                    response,
+                    extensions=["extra", "nl2br", "sane_lists"]
+                ),
             )
 
         return redirect(reverse("chat:chat"))
