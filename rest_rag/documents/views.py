@@ -4,6 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Documents
 from rag.rag_utils import (
     extract_text,
@@ -18,15 +19,14 @@ import tempfile
 from pathlib import Path
 
 
-class DocumentUploadView(View):
+class DocumentUploadView(LoginRequiredMixin, View):
+    login_url = '/accounts/login/'
     def get(self, request):
-        print("GET request received")
         docs = Documents.objects.filter(user=request.user).order_by("-uploaded_at")
 
         return render(request, "documents/document.html", {"documents": docs})
 
     def post(self, request):
-        print("POST request received")
         uploaded_file = request.FILES.get("document")
 
         if not uploaded_file:
@@ -72,7 +72,7 @@ class DocumentUploadView(View):
             return redirect("documents:upload")
 
 
-class DocumentDeleteView(View):
+class DocumentDeleteView(LoginRequiredMixin, View):
     def post(self, request, pk):
         doc = get_object_or_404(Documents, pk=pk, user=request.user)
 
